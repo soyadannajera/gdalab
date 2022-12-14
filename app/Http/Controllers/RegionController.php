@@ -8,6 +8,7 @@ use App\Http\Resources\RegionResource;
 use App\Models\Region;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Services\PayUService\Exception;
 
 class RegionController extends Controller
 {
@@ -24,7 +25,7 @@ class RegionController extends Controller
         $regions = Region::all();
         $respuesta = RegionResource::collection($regions);
         \Log::channel('mydblog')->info('S '.serialize($respuesta));
-        return $respuesta;
+        return response([$respuesta, 'success' => true],200);
     }
 
     /**
@@ -47,9 +48,16 @@ class RegionController extends Controller
     {
         \Log::channel('mydblog')->info('E '. Route::currentRouteAction().' '.$request.' '.serialize($request->all()));
 
-        $regions = Region::create($request->all());
+        try {
+            $regions = Region::create($request->all());
+        } catch(\Exception $e){
+            \Log::channel('mydblog')->error('S '.$e );
+            return response([$e, 'success' => false], 200);
+        }
+        
+        $r = new RegionResource($regions);
         \Log::channel('mydblog')->info('S '.serialize($regions));
-        return new RegionResource($regions);
+        return response([$r, 'success' => true],200);
     }
 
     /**
@@ -70,7 +78,7 @@ class RegionController extends Controller
  
          \Log::channel('mydblog')->info('S '.Route::currentRouteAction().' Registro: '.$region);
  
-         return response($region, 200);
+         return response([$region, 'success' => true],200);
     }
 
     /**
@@ -98,7 +106,8 @@ class RegionController extends Controller
         $region->update($request->all());
 
         \Log::channel('mydblog')->info('S '.Route::currentRouteAction().' Registro: '.$region);
-        return new RegionResource($region);
+        $r = new RegionResource($region);
+        return response([$r, 'success' => true],200);
     }
 
     /**
@@ -121,6 +130,6 @@ class RegionController extends Controller
         
         \Log::channel('mydblog')->info('S '.Route::currentRouteAction().' Registro: '.$region);
 
-        return response($region, 200);
+        return response([$region, 'success' => true],200);
     }
 }

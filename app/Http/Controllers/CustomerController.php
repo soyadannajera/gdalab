@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 use JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use App\Models\Authenticatable;
+use App\Services\PayUService\Exception;
 
 class CustomerController extends Controller
 {
@@ -59,7 +60,7 @@ class CustomerController extends Controller
         $customers = Customer::where('status', 'A')->get();
         $respuesta = CustomerResource::collection($customers);
         \Log::channel('mydblog')->info('S '.serialize($respuesta));
-        return $respuesta;
+        return response([$respuesta, 'success' => true],200);
     }
 
     /**
@@ -83,14 +84,21 @@ class CustomerController extends Controller
         \Log::channel('mydblog')->info('E '. Route::currentRouteAction().' '.$request.' '.serialize($request->all()));
 
         if($region = Region::find($request->id_reg)->communes()->where('id_reg', $request->id_reg)->first()){
-            $customers = Customer::create($request->all());
+            try {
+                $customers = Customer::create($request->all());
+            } catch(\Exception $e){
+                \Log::channel('mydblog')->error('S '.$e );
+                return response([$e, 'success' => false], 200);
+            }
         } else {
             \Log::channel('mydblog')->info('S Comuna no pertenece a region');
             return "Comuna no pertenece a region";
         }
+            $c = new CustomerResource($customers);
+        
 
         \Log::channel('mydblog')->info('S '.serialize($customers));
-        return new CustomerResource($customers);
+        return response([$c, 'success' => true],200);
     }
 
     /**
@@ -111,7 +119,7 @@ class CustomerController extends Controller
  
          \Log::channel('mydblog')->info('S '.Route::currentRouteAction().' Registro: '.$customer);
  
-         return response($customer->with('commune.region')->first(), 200);
+         return response([$customer->with('commune.region')->first(), 'success' => true], 200);
     }
 
     /**
@@ -139,7 +147,8 @@ class CustomerController extends Controller
         $customer->update($request->all());
 
         \Log::channel('mydblog')->info('S '.Route::currentRouteAction().' Registro: '.$customer);
-        return new CustomerResource($customer);
+        $c = new CustomerResource($customer);
+        return response([$c, 'success' => true],200);
     }
 
     /**
@@ -162,6 +171,6 @@ class CustomerController extends Controller
         
         \Log::channel('mydblog')->info('S '.Route::currentRouteAction().' Registro: '.$customer);
 
-        return response($customer, 200);
+        return response([$customer,  'success' => true],200);
     }
 }

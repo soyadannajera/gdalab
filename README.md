@@ -10,6 +10,7 @@
 3. [Requisitos](#requisitos)
 3. [Instalacion](#instalacion)
 4. [Uso de Apis](#uso-de-apis)
+5. [Archivo Log](#archivo-log)
 
 ## General Info
 ***
@@ -58,3 +59,6 @@ POST            api/region....................................... region.store �
 GET|HEAD        api/region/{region}................................ region.show › RegionController@show
 PUT|PATCH       api/region/{region}............................ region.update › RegionController@update
 DELETE          api/region/{region}.......................... region.destroy › RegionController@destroy
+
+## Archivo Log
+/raiz_proyecto/storage/logs/mydblog.log

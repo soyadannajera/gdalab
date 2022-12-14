@@ -8,6 +8,7 @@ use App\Http\Resources\CommuneResource;
 use App\Models\Commune;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Services\PayUService\Exception;
 
 class CommuneController extends Controller
 {
@@ -23,7 +24,7 @@ class CommuneController extends Controller
         $communes = Commune::where('status', 'A')->get();
         $respuesta = CommuneResource::collection($communes);
         \Log::channel('mydblog')->info('S '.serialize($respuesta));
-        return $respuesta;
+        return response([$respuesta, 'success' => true],200);
     }
 
     /**
@@ -46,9 +47,15 @@ class CommuneController extends Controller
     {
         \Log::channel('mydblog')->info('E '. Route::currentRouteAction().' '.$request.' '.serialize($request->all()));
 
-        $communes = Commune::create($request->all());
+        try {
+            $communes = Commune::create($request->all());
+        } catch(\Exception $e){
+            \Log::channel('mydblog')->error('S '.$e );
+            return response([$e, 'success' => false], 200);
+        }
+        $c = new CommuneResource($communes);
         \Log::channel('mydblog')->info('S '.serialize($communes));
-        return new CommuneResource($communes);
+        return response([$c, 'success' => true],200);
     }
 
     /**
@@ -69,7 +76,7 @@ class CommuneController extends Controller
 
         \Log::channel('mydblog')->info('S '.Route::currentRouteAction().' Registro: '.$commune);
 
-        return response($commune, 200);
+        return response([$commune, 'success' => true],200);
     }
 
     /**
@@ -97,8 +104,9 @@ class CommuneController extends Controller
 
         $commune->update($request->all());
 
+        $c = new CommuneResource($commune);
         \Log::channel('mydblog')->info('S '.Route::currentRouteAction().' Registro: '.$commune);
-        return new CommuneResource($commune);
+        return response([$c, 'success' => true],200);
     }
 
     /**
@@ -121,6 +129,6 @@ class CommuneController extends Controller
         
         \Log::channel('mydblog')->info('S '.Route::currentRouteAction().' Registro: '.$commune);
 
-        return response($commune, 200);
+        return response([$commune, 'success' => true],200);
     }
 }

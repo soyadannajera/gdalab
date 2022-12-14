@@ -117,6 +117,11 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+        'mydblog' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/mydblog.log'),
+            'level' => 'info',
+        ],
     ],
 
 ];

@@ -18,12 +18,14 @@ use App\Http\Controllers\RegionController;
 |
 */
 
-Route::post('register', 'App\Http\Controllers\UserController@register');
+Route::post('customer', 'App\Http\Controllers\CustomerController@store');
+Route::post('commune', 'App\Http\Controllers\CommuneController@store');
+Route::post('region', 'App\Http\Controllers\RegionController@store');
 Route::post('login', 'App\Http\Controllers\CustomerController@authenticate');
 
 Route::group(['middleware' => ['auth:sanctum']], function() {
-    Route::apiResource('commune',CommuneController::class);
-    Route::apiResource('customer',CustomerController::class);
-    Route::apiResource('region',RegionController::class);
+    Route::apiResource('commune',CommuneController::class,['except' => ['store']]);
+    Route::apiResource('customer',CustomerController::class,['except' => ['store']]);
+    Route::apiResource('region',RegionController::class,['except' => ['store']]);
 
 });

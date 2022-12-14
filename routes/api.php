@@ -3,6 +3,10 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\CommuneController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\RegionController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -15,10 +19,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('register', 'App\Http\Controllers\UserController@register');
-Route::post('login', 'App\Http\Controllers\UserController@authenticate');
+Route::post('login', 'App\Http\Controllers\CustomerController@authenticate');
 
-Route::group(['middleware' => ['jwt.verify']], function() {
-
-    Route::post('user','App\Http\Controllers\UserController@getAuthenticatedUser');
+Route::group(['middleware' => ['auth:sanctum']], function() {
+    Route::apiResource('commune',CommuneController::class);
+    Route::apiResource('customer',CustomerController::class);
+    Route::apiResource('region',RegionController::class);
 
 });
